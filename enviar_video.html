@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enviar Vídeo</title>
+</head>
+<body>
+    <h1>Enviar Vídeo</h1>
+    
+    <!-- Formulário para envio de vídeos com URL -->
+    <form action="processar_url.php" method="POST">
+        <label for="nome">Nome do Vídeo:</label>
+        <input type="text" id="nome" name="nome" required><br><br>
+
+        <label for="url">URL do Vídeo:</label>
+        <input type="text" id="url" name="url" required><br><br>
+
+        <input type="submit" value="Enviar Vídeo">
+    </form>
+</body>
+</html>
