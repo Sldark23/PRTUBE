@@ -1,0 +1,5 @@
+CREATE TABLE videos (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    url VARCHAR(255) NOT NULL
+);
