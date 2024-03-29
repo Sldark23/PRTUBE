@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRTUBE</title>
+</head>
+<body>
+    <h1>PrTube</h1>
+    
+    <!-- Container para os vídeos -->
+    <div id="videosContainer"></div>
+
+    <!-- Script para acessar a API do Google Drive -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script>
+        // Função para carregar a API do Google Drive
+        function handleClientLoad() {
+            gapi.load('client', initClient);
+        }
+
+        // Inicializar a API do Google Drive
+        function initClient() {
+            gapi.client.init({
+                'apiKey': 'AIzaSyC4ZZz7-wSD3v7VqmDbRm-hI1ufwyaSs78',
+                'discoveryDocs': ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+            }).then(function () {
+                listFiles();
+            });
+        }
+
+        // Listar os vídeos do Google Drive
+        function listFiles() {
+            gapi.client.drive.files.list({
+                'pageSize': 99999, // Quantidade de vídeos a serem listados
+                'fields': 'files(id, name, webViewLink)',
+                'q': "'14oBAdLXlRHLf9wyrCNwZu6FEmOFFO3c7' in parents and mimeType='video/mp4'", // Substitua 'PASTA_ID' pela ID da pasta no Google Drive
+            }).then(function(response) {
+                var videosContainer = document.getElementById('videosContainer');
+                var videos = response.result.files;
+                
+                if (videos && videos.length > 0) {
+                    videos.forEach(function(video) {
+                        var iframe = document.createElement('iframe');
+                        iframe.src = video.webViewLink;
+                        iframe.width = '560';
+                        iframe.height = '315';
+                        iframe.allowFullscreen = true;
+                        
+                        var videoTitle = document.createElement('h3');
+                        videoTitle.textContent = video.name;
+                        
+                        videosContainer.appendChild(videoTitle);
+                        videosContainer.appendChild(iframe);
+                    });
+                } else {
+                    videosContainer.textContent = 'Nenhum vídeo encontrado.';
+                }
+            });
+        }
+
+        // Carregar a API do Google Drive ao iniciar a página
+        handleClientLoad();
+    </script>
+</body>
+</html>
