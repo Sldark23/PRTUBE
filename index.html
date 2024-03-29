@@ -3,64 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRTUBE</title>
+    <title>Seu Site de Vídeos</title>
 </head>
 <body>
-    <h1>PrTube</h1>
-    
-    <!-- Container para os vídeos -->
-    <div id="videosContainer"></div>
+    <h1>Bem-vindo ao Seu Site de Vídeos</h1>
 
-    <!-- Script para acessar a API do Google Drive -->
-    <script src="https://apis.google.com/js/api.js"></script>
-    <script>
-        // Função para carregar a API do Google Drive
-        function handleClientLoad() {
-            gapi.load('client', initClient);
+    <!-- Link para o formulário de envio de vídeos -->
+    <p><a href="enviar_video.html">Clique aqui para enviar um vídeo</a></p>
+
+    <h2>Vídeos Recentes</h2>
+    <div id="videosContainer">
+        <!-- Aqui você pode exibir os vídeos mais recentes da sua base de dados -->
+        <?php
+        include 'config.php'; // Inclua o arquivo de configuração
+
+        try {
+            // Conexão com o banco de dados usando PDO
+            $conn = new PDO("pgsql:host=$host;dbname=$dbname", $user, $password);
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            // Query para obter os vídeos mais recentes do banco de dados
+            $query = $conn->query("SELECT nome, url FROM videos ORDER BY id DESC LIMIT 5");
+            $videos = $query->fetchAll(PDO::FETCH_ASSOC);
+
+            // Exibir os vídeos na página
+            foreach ($videos as $video) {
+                echo '<h3>' . $video['nome'] . '</h3>';
+                echo '<iframe width="560" height="315" src="' . $video['url'] . '" allowfullscreen></iframe>';
+            }
+        } catch(PDOException $e) {
+            // Em caso de erro na conexão ou na consulta SQL
+            echo 'Erro ao conectar ao banco de dados: ' . $e->getMessage();
+        } finally {
+            // Fechar a conexão com o banco de dados
+            $conn = null;
         }
-
-        // Inicializar a API do Google Drive
-        function initClient() {
-            gapi.client.init({
-                'apiKey': 'AIzaSyC4ZZz7-wSD3v7VqmDbRm-hI1ufwyaSs78',
-                'discoveryDocs': ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
-            }).then(function () {
-                listFiles();
-            });
-        }
-
-        // Listar os vídeos do Google Drive
-        function listFiles() {
-            gapi.client.drive.files.list({
-                'pageSize': 99999, // Quantidade de vídeos a serem listados
-                'fields': 'files(id, name, webViewLink)',
-                'q': "'19IrQXEP0aEn1dV-PiQizj65B-eSC3YYe' in parents and mimeType='video/mp4'", // Substitua 'PASTA_ID' pela ID da pasta no Google Drive
-            }).then(function(response) {
-                var videosContainer = document.getElementById('videosContainer');
-                var videos = response.result.files;
-                
-                if (videos && videos.length > 0) {
-                    videos.forEach(function(video) {
-                        var iframe = document.createElement('iframe');
-                        iframe.src = video.webViewLink;
-                        iframe.width = '560';
-                        iframe.height = '315';
-                        iframe.allowFullscreen = true;
-                        
-                        var videoTitle = document.createElement('h3');
-                        videoTitle.textContent = video.name;
-                        
-                        videosContainer.appendChild(videoTitle);
-                        videosContainer.appendChild(iframe);
-                    });
-                } else {
-                    videosContainer.textContent = 'Nenhum vídeo encontrado.';
-                }
-            });
-        }
-
-        // Carregar a API do Google Drive ao iniciar a página
-        handleClientLoad();
-    </script>
+        ?>
+    </div>
 </body>
 </html>
